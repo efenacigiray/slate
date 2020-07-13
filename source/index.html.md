@@ -1,11 +1,5 @@
 ---
-title: API Reference
-
-language_tabs: # must be one of https://git.io/vQNgJ
-  - shell
-  - ruby
-  - python
-  - javascript
+title: Storyly API Reference
 
 toc_footers:
   - <a href='#'>Sign Up for a Developer Key</a>
@@ -15,227 +9,497 @@ includes:
   - errors
 
 search: true
-
 code_clipboard: true
 ---
 
-# Introduction
+# Getting Started
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+Welcome to the Storyly API! You can use Storyly API to manage your story groups and stories via HTTP requests.
 
-We have language bindings in Shell, Ruby, Python, and JavaScript! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
+To use the external API, you will need to create a unique API Token from dashboard.
 
-This example API documentation page was created with [Slate](https://github.com/slatedocs/slate). Feel free to edit it and use it as a base for your own API's documentation.
+Login to dashboard, navigate to `Settings > Account Settings` page, where you can create or update your token.
 
-# Authentication
+This token provides read and write access to your account, so do not share or distribute it. Grant access only to those who need it. Ensure it is kept out of any version control system you may be using.  
+Do not use this API to publish your stories to any platform, as it is rate limited and your token will be exposed.
 
-> To authorize, use this code:
 
-```ruby
-require 'kittn'
+# Endpoints
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
+```sh
+curl \
+    -H "Accept: application/json" \
+    -H "Content-Type: application/json" \
+    "https://api.storyly.io/api/story_group?token=your_token_here&filter=value"
+```
+> Make sure to replace `your_token_here` with your API token.
+
+Storyly API base URL is: `https://api.storyly.io/api`
+
+Currently available endpoints are:  `/story_group` `/story`
+
+Token should be provided on query string of each API request, such as:  
+`https://api.storyly.io/api/story_group?token=your_token_here`
+
+All post / patch request bodies should be in JSON format and `Content-Type: applicaton/json` should be added to request header.
+
+Available filters and parameters (will be described in detail below) can be added to query string.
+
+
+# Story Group
+
+## Story Group Endpoints
+
+```sh
+https://api.storyly.io/api/story_group
 ```
 
-```python
-import kittn
+Story Group Endpoint allows list, create, update and delete actions.  
 
-api = kittn.authorize('meowmeowmeow')
-```
 
-```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-```
-
-> Make sure to replace `meowmeowmeow` with your API key.
-
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
-
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
-
-`Authorization: meowmeowmeow`
-
-<aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
-
-# Kittens
-
-## Get All Kittens
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
-
-```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
-```
-
-> The above command returns JSON structured like this:
+## Story Group Entity
 
 ```json
-[
-  {
+{
     "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
-  },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
-  }
-]
+    "app_id": 1,
+    "title": "Test Story Group",
+    "icon": "https://db62cod6cnasq.cloudfront.net/user-media/1044/a6b1932c53fedeb801cb7a0d6c038be4.jpg",
+    "target_cap": 1000,
+    "pinned": 0,
+    "sort_order": 1,
+    "settings": null,
+    "segments": ["segment1", "segment2"],
+    "status": 1,
+    "views": 5003,
+    "ts_start": "2020-07-09 08:15:00",
+    "ts_end": null,
+    "ts_created": "2020-07-09 08:15:00",
+    "ts_updated": "2020-07-09 08:15:00"
+}
 ```
 
-This endpoint retrieves all kittens.
+Parameter   | Type          | Description
+---------   | -----------   | -----------
+id          | integer       | Internal ID of the story group.
+app_id      | integer       | Internal ID of the app this story group attached.
+title       | string        | Title of the story group.
+icon        | string        | URL of the story group icon.
+target_cap  | integer       | Target view cap. Story group will be paused when view count reaches cap.
+pinned      | boolean       | Pin status of the story group.
+segments    | array         | An array of strings, your story groups will be segmented using these segments. Available in Storyly SDK 1.3.0 and later.
+sort_order  | integer       | Order of the story group.
+settings    | object        | Additonal story group settings.
+status      | integer       | Status of the story group. Only ACTIVE story groups will be displayed by SDK.<br>Possible values: <br>`ACTIVE = 1`,<br>`PASSIVE = 2`,<br>`CAP_REACHED = 3`,<br>`END_DATE_REACHED = 4`,<br>`ARCHIVED = 9`
+views       | integer       | View count of the story group.
+ts_start    | date          | Start date of the story group. Story group will not be displayed by SDK if this date is not reached.
+ts_end      | date          | End date of the story group. Story group will not be displayed by SDK after this date is reached. Set as `null` if you do not want to set an end date.
+ts_created  | date          | Date story group was created.
+ts_updated  | date          | Date story group was updated.
+
+## Create a Story Group
+
+```sh
+curl \
+    --header 'Content-Type: application/json' \
+    --request POST \
+    --data '{
+        "app_id": 1,
+        "title": "Test Story Group",
+        "icon": "https://via.placeholder.com/250x250.jpg?text=StoryGroupIcon",
+        "target_cap": null,
+        "pinned": false,
+        "segments": null,
+        "sort_order": 1,
+        "settings": null,
+        "status": 1,
+        "ts_start": "2020-07-09 08:15:00"
+        "ts_end": null
+    }' \
+    'https://api.storyly.io/api/story_group?token=your_token_here'
+```
+Create a new story group on given storyly instance.
 
 ### HTTP Request
 
-`GET http://example.com/api/kittens`
+`POST https://api.storyly.io/api/story_group?token=your_token_here`
 
-### Query Parameters
+## Get a Specific Story Group
 
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
-
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
-
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
+```sh
+curl \
+    --header 'Content-Type: application/json' \
+    --request GET \
+    'https://api.storyly.io/api/story_group/detail?token=your_token_here&id=150'
 ```
 
 > The above command returns JSON structured like this:
 
 ```json
 {
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
+    "status": "ok",
+    "message": "success",
+    "data": {
+        "id": 150,
+        "app_id": 1,
+        "title": "Test Story Group",
+        "icon": "https://db62cod6cnasq.cloudfront.net/user-media/1044/a6b1932c53fedeb801cb7a0d6c038be4.jpg",
+        "target_cap": 1000,
+        "pinned": 0,
+        "sort_order": 1,
+        "settings": null,
+        "segments": ["segment1", "segment2"],
+        "status": 1,
+        "views": 5003,
+        "ts_start": "2020-07-09 08:15:00",
+        "ts_end": null,
+        "ts_created": "2020-07-09 08:15:00",
+        "ts_updated": "2020-07-09 08:15:00"
+    }
 }
 ```
 
-This endpoint retrieves a specific kitten.
-
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
+This endpoint retrieves a specific story group.
 
 ### HTTP Request
 
-`GET http://example.com/kittens/<ID>`
+`GET https://api.storyly.io/api/story_group/detail?token=your_token_here&id=150`
 
 ### URL Parameters
 
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to retrieve
+Parameter   | Description
+---------   | -----------
+id          | The ID of the story group to retrieve
 
-## Delete a Specific Kitten
+## List Story Groups
 
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -X DELETE
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.delete(2);
+```sh
+curl \
+    --header 'Content-Type: application/json' \
+    --request GET \
+    'https://api.storyly.io/api/story_group?token=your_token_here'
 ```
 
 > The above command returns JSON structured like this:
 
 ```json
 {
-  "id": 2,
-  "deleted" : ":("
+    "status": "ok",
+    "message": "success",
+    "data": [
+        {
+            "id": 150,
+            "app_id": 1,
+            "title": "Test Story Group",
+            "icon": "https://db62cod6cnasq.cloudfront.net/user-media/1044/a6b1932c53fedeb801cb7a0d6c038be4.jpg",
+            "target_cap": 1000,
+            "pinned": 0,
+            "sort_order": 1,
+            "settings": null,
+            "segments": ["segment1", "segment2"],
+            "status": 1,
+            "views": 5003,
+            "ts_start": "2020-07-09 08:15:00",
+            "ts_end": null,
+            "ts_created": "2020-07-09 08:15:00",
+            "ts_updated": "2020-07-09 08:15:00"
+        },
+        {
+            "id": 151,
+            "app_id": 1,
+            "title": "Test Story Group",
+            "icon": "https://db62cod6cnasq.cloudfront.net/user-media/1044/a6b1932c53fedeb801cb7a0d6c038be4.jpg",
+            "target_cap": 1000,
+            "pinned": 0,
+            "sort_order": 1,
+            "settings": null,
+            "segments": ["segment1", "segment2"],
+            "status": 1,
+            "views": 5003,
+            "ts_start": "2020-07-09 08:15:00",
+            "ts_end": null,
+            "ts_created": "2020-07-09 08:15:00",
+            "ts_updated": "2020-07-09 08:15:00"
+        }, ...
+    ]
 }
 ```
 
-This endpoint deletes a specific kitten.
+This endpoint lists story groups.
 
 ### HTTP Request
 
-`DELETE http://example.com/kittens/<ID>`
+`GET https://api.storyly.io/api/story_group/detail?token=your_token_here&id=150`
+
+
+## Update a Specific Story Group
+
+```sh
+curl \
+    --header 'Content-Type: application/json' \
+    --request PATCH \
+    --data '{
+        "title": "Test Story Group",
+        "icon": "https://via.placeholder.com/250x250.jpg?text=StoryGroupIcon",
+        "target_cap": null,
+        "pinned": false,
+        "segments": null,
+        "sort_order": 1,
+        "settings": null,
+        "status": 1,
+        "ts_start": "2020-07-09 08:15:00"
+        "ts_end": null
+    }' \
+    'https://api.storyly.io/api/story_group?token=your_token_here&id=150'
+```
+
+This endpoint updates a specific story group.
+
+### HTTP Request
+
+`PATCH https://api.storyly.io/api/story_group?token=your_token_here&id=150`
 
 ### URL Parameters
 
 Parameter | Description
 --------- | -----------
-ID | The ID of the kitten to delete
+id        | The ID of the story group to update
+
+# Story
+
+## Story Endpoints
+
+```sh
+https://api.storyly.io/api/story
+```
+
+Story Endpoint allows list, create, update and delete actions.  
+
+
+## Story Entity
+
+```json
+{
+    "id": 1000,
+    "story_group_id": 150,
+    "type": 1,
+    "title": "Test Story",
+    "sort_order": 1,
+    "media": "https://db62cod6cnasq.cloudfront.net/user-media/1044/a6b1932c53fedeb801cb7a0d6c038be4.jpg",
+    "media_raw": "https://db62cod6cnasq.cloudfront.net/user-media/1044/a6b1932c53fedeb801cb7a0d6c038be4.jpg",
+    "mime_type": "image/jpeg",
+    "target_cap": 1000,
+    "button_text": "Click Here",
+    "outlink": "https://google.com",
+    "deep_link": "app://s=1",
+    "settings": {},
+    "status": 1,
+    "views": 5000,
+    "ts_start": "2020-07-09 08:15:00",
+    "ts_end": null,
+    "ts_created": "2020-07-09 08:15:00",
+    "ts_updated": "2020-07-09 08:15:00"
+}
+```
+
+Parameter       | Type          | Description
+---------       | -----------   | -----------
+id              | integer       | Internal ID of the story.
+story_group_id  | integer       | Internal ID of the story group this story is attached.
+type            | integer       | Media type of the story. 1 for image, 2 for video, 3 for template stories. <small>Will be filled by system, do not post this field when creating / updating a story.</small>
+title           | string        | Title of the story.
+sort_order      | integer       | Order of the story.
+media           | string        | URL of the optimized media.
+media_raw       | string        | URL of the original media.
+mime_type       | string        | Mime Type of the media. `image/jpeg`, `video/mp4`. <small>Will be filled by system, do not post this field when creating / updating a story.</small>
+target_cap      | integer       | Target view cap. Story will be paused when view count reaches cap.
+button_text     | string        | CTA Button text.
+outlink         | string        | CTA Button link.
+deep_link       | string        | Deep link of the story. <small>Will be filled by system, do not post this field when creating / updating a story.</small>
+settings        | object        | Additonal story settings.
+status          | integer       | Status of the story. Only ACTIVE stories will be displayed by SDK.<br>Possible values: <br>`ACTIVE = 1`<br>`PASSIVE = 2`<br>`PASSIVE_BY_STORY_GROUP = 3`<br>`END_DATE_REACHED = 4`<br>`CAP_REACHED = 5`<br>`WAITING_MEDIA_IMPORT = 6`<br>`FAILED_MEDIA_IMPORT = 7`<br>`ARCHIVED = 9`
+views           | integer       | View count of the story. <small>Will be filled by system as story recieves impressions, do not post this field when creating / updating a story.</small>
+ts_start        | date          | Start date of the story. Story will not be displayed by SDK if this date is not reached.
+ts_end          | date          | End date of the story. Story will not be displayed by SDK after this date is reached. Set as `null` if you do not want to set an end date.
+ts_created      | date          | Date story was created. <small>Will be filled by system, do not post this field when creating / updating a story.</small>
+ts_updated      | date          | Date story was updated. <small>Will be filled by system, do not post this field when creating / updating a story.</small>
+
+## Create a Story
+
+```sh
+curl \
+    --header 'Content-Type: application/json' \
+    --request POST \
+    --data '{
+        "story_group_id": 150,
+        "title": "Test Story",
+        "sort_order": 1,
+        "media": "https://db62cod6cnasq.cloudfront.net/user-media/1044/a6b1932c53fedeb801cb7a0d6c038be4.jpg",
+        "target_cap": 1000,
+        "button_text": "Click Here",
+        "outlink": "https://google.com",
+        "settings": {},
+        "status": 1,
+        "ts_start": "2020-07-09 08:15:00",
+        "ts_end": null
+    }' \
+    'https://api.storyly.io/api/story?token=your_token_here'
+```
+Create a new story on given story group.
+
+### HTTP Request
+
+`POST https://api.storyly.io/api/story?token=your_token_here`
+
+## Get a Specific Story
+
+```sh
+curl \
+    --header 'Content-Type: application/json' \
+    --request GET \
+    'https://api.storyly.io/api/story/detail?token=your_token_here&id=1000'
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+    "status": "ok",
+    "message": "success",
+    "data": {
+        "id": 1000,
+        "story_group_id": 150,
+        "type": 1,
+        "title": "Test Story",
+        "sort_order": 1,
+        "media": "https://db62cod6cnasq.cloudfront.net/user-media/1044/a6b1932c53fedeb801cb7a0d6c038be4.jpg",
+        "media_raw": "https://db62cod6cnasq.cloudfront.net/user-media/1044/a6b1932c53fedeb801cb7a0d6c038be4.jpg",
+        "mime_type": "image/jpeg",
+        "target_cap": 1000,
+        "button_text": "Click Here",
+        "outlink": "https://google.com",
+        "deep_link": "app://s=1",
+        "settings": {},
+        "status": 1,
+        "views": 5000,
+        "ts_start": "2020-07-09 08:15:00",
+        "ts_end": null,
+        "ts_created": "2020-07-09 08:15:00",
+        "ts_updated": "2020-07-09 08:15:00"
+    }
+}
+```
+
+This endpoint retrieves a specific story.
+
+### HTTP Request
+
+`GET https://api.storyly.io/api/story/detail?token=your_token_here&id=150`
+
+### URL Parameters
+
+Parameter   | Description
+---------   | -----------
+id          | The ID of the story to retrieve
+
+## List Stories
+
+```sh
+curl \
+    --header 'Content-Type: application/json' \
+    --request GET \
+    'https://api.storyly.io/api/story?token=your_token_here'
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+    "status": "ok",
+    "message": "success",
+    "data": [
+        {
+            "id": 1000,
+            "story_group_id": 150,
+            "type": 1,
+            "title": "Test Story",
+            "sort_order": 1,
+            "media": "https://db62cod6cnasq.cloudfront.net/user-media/1044/a6b1932c53fedeb801cb7a0d6c038be4.jpg",
+            "media_raw": "https://db62cod6cnasq.cloudfront.net/user-media/1044/a6b1932c53fedeb801cb7a0d6c038be4.jpg",
+            "mime_type": "image/jpeg",
+            "target_cap": 1000,
+            "button_text": "Click Here",
+            "outlink": "https://google.com",
+            "deep_link": "app://s=1",
+            "settings": {},
+            "status": 1,
+            "views": 5000,
+            "ts_start": "2020-07-09 08:15:00",
+            "ts_end": null,
+            "ts_created": "2020-07-09 08:15:00",
+            "ts_updated": "2020-07-09 08:15:00"
+        },
+        {
+            "id": 1001,
+            "story_group_id": 150,
+            "type": 1,
+            "title": "Test Story",
+            "sort_order": 1,
+            "media": "https://db62cod6cnasq.cloudfront.net/user-media/1044/a6b1932c53fedeb801cb7a0d6c038be4.jpg",
+            "media_raw": "https://db62cod6cnasq.cloudfront.net/user-media/1044/a6b1932c53fedeb801cb7a0d6c038be4.jpg",
+            "mime_type": "image/jpeg",
+            "target_cap": 1000,
+            "button_text": "Click Here",
+            "outlink": "https://google.com",
+            "deep_link": "app://s=1",
+            "settings": {},
+            "status": 1,
+            "views": 5000,
+            "ts_start": "2020-07-09 08:15:00",
+            "ts_end": null,
+            "ts_created": "2020-07-09 08:15:00",
+            "ts_updated": "2020-07-09 08:15:00"
+        }, ...
+    ]
+}
+```
+
+This endpoint lists stories.
+
+### HTTP Request
+
+`GET https://api.storyly.io/api/story_group/detail?token=your_token_here&id=150`
+
+
+## Update a Specific Story
+
+```sh
+curl \
+    --header 'Content-Type: application/json' \
+    --request PATCH \
+    --data '{
+        "title": "Test Story",
+        "sort_order": 1,
+        "target_cap": 1000,
+        "button_text": "Click Here",
+        "outlink": "https://google.com",
+        "settings": {},
+        "status": 1,
+        "ts_start": "2020-07-09 08:15:00",
+        "ts_end": null
+    }' \
+    'https://api.storyly.io/api/story?token=your_token_here&id=150'
+```
+
+This endpoint updates a specific story.
+
+### HTTP Request
+
+`PATCH https://api.storyly.io/api/story?token=your_token_here&id=150`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+id        | The ID of the story to update
 

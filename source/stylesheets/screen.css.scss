@@ -74,8 +74,10 @@ html, body {
   // This is the logo at the top of the ToC
   .logo {
     display: block;
-    max-width: 100%;
+    max-width: 80%;
+    margin: 0 auto;
     margin-bottom: $logo-margin;
+    margin-top: 10px;
   }
 
   &>.search {
@@ -365,11 +367,11 @@ html, body {
   h2 {
     @extend %header-font;
     font-size: 19px;
-    margin-top: 4em;
+    margin-top: 2em;
     margin-bottom: 0;
     border-top: 1px solid #ccc;
-    padding-top: 1.2em;
-    padding-bottom: 1.2em;
+    padding-top: 1em;
+    padding-bottom: 1em;
     background-image: linear-gradient(to bottom, rgba(#fff, 0.2), rgba(#fff, 0));
   }
 
@@ -450,8 +452,8 @@ html, body {
   }
 
   code {
-    background-color: rgba(0,0,0,0.05);
-    padding: 3px;
+    background-color: rgba(164, 164, 164, 0.42);
+    padding: 2px 4px;
     border-radius: 3px;
     @extend %break-words;
     @extend %code-font;
@@ -541,9 +543,9 @@ html, body {
 
   pre {
     @extend %code-font;
-    padding-top: 2em;
-    padding-bottom: 2em;
-    padding: 2em $main-padding;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    padding: 1em $main-padding;
   }
 
   blockquote {
