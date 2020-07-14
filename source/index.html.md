@@ -5,9 +5,6 @@ toc_footers:
   - <a href='#'>Sign Up for a Developer Key</a>
   - <a href='https://github.com/slatedocs/slate'>Documentation Powered by Slate</a>
 
-includes:
-  - errors
-
 search: true
 code_clipboard: true
 ---
@@ -20,7 +17,7 @@ To use the external API, you will need to create a unique API Token from dashboa
 
 Login to dashboard, navigate to `Settings > Account Settings` page, where you can create or update your token.
 
-This token provides read and write access to your account, so do not share or distribute it. Grant access only to those who need it. Ensure it is kept out of any version control system you may be using.  
+This token provides read and write access to your account, so do not share or distribute it. Grant access only to those who need it. Ensure it is kept out of any version control system you may be using.
 Do not use this API to publish your stories to any platform, as it is rate limited and your token will be exposed.
 
 
@@ -38,7 +35,7 @@ Storyly API base URL is: `https://api.storyly.io/api`
 
 Currently available endpoints are:  `/story_group` `/story`
 
-Token should be provided on query string of each API request, such as:  
+Token should be provided on query string of each API request, such as:
 `https://api.storyly.io/api/story_group?token=your_token_here`
 
 All post / patch request bodies should be in JSON format and `Content-Type: applicaton/json` should be added to request header.
@@ -54,7 +51,7 @@ Available filters and parameters (will be described in detail below) can be adde
 https://api.storyly.io/api/story_group
 ```
 
-Story Group Endpoint allows list, create, update and delete actions.  
+Story Group Endpoint allows list, create, update and delete actions.
 
 
 ## Story Group Entity
@@ -91,11 +88,11 @@ segments    | array         | An array of strings, your story groups will be seg
 sort_order  | integer       | Order of the story group.
 settings    | object        | Additonal story group settings.
 status      | integer       | Status of the story group. Only ACTIVE story groups will be displayed by SDK.<br>Possible values: <br>`ACTIVE = 1`,<br>`PASSIVE = 2`,<br>`CAP_REACHED = 3`,<br>`END_DATE_REACHED = 4`,<br>`ARCHIVED = 9`
-views       | integer       | View count of the story group.
+views       | integer       | View count of the story group. <br><small>Will be filled by system, do not post this field when creating / updating a story.</small>
 ts_start    | date          | Start date of the story group. Story group will not be displayed by SDK if this date is not reached.
 ts_end      | date          | End date of the story group. Story group will not be displayed by SDK after this date is reached. Set as `null` if you do not want to set an end date.
-ts_created  | date          | Date story group was created.
-ts_updated  | date          | Date story group was updated.
+ts_created  | date          | Date story group was created. <br><small>Will be filled by system, do not post this field when creating / updating a story.</small>
+ts_updated  | date          | Date story group was updated. <br><small>Will be filled by system, do not post this field when creating / updating a story.</small>
 
 ## Create a Story Group
 
@@ -265,6 +262,28 @@ Parameter | Description
 --------- | -----------
 id        | The ID of the story group to update
 
+
+## Delete a Specific Story Group
+
+```sh
+curl \
+    --header 'Content-Type: application/json' \
+    --request DELETE \
+    'https://api.storyly.io/api/story_group?token=your_token_here&id=150'
+```
+
+This endpoint deletes a specific story group. Entities will be deleted permanently.
+
+### HTTP Request
+
+`DELETE https://api.storyly.io/api/story_group?token=your_token_here&id=150`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+id        | The ID of the story group to update
+
 # Story
 
 ## Story Endpoints
@@ -273,7 +292,7 @@ id        | The ID of the story group to update
 https://api.storyly.io/api/story
 ```
 
-Story Endpoint allows list, create, update and delete actions.  
+Story Endpoint allows list, create, update and delete actions.
 
 
 ## Story Entity
@@ -306,23 +325,23 @@ Parameter       | Type          | Description
 ---------       | -----------   | -----------
 id              | integer       | Internal ID of the story.
 story_group_id  | integer       | Internal ID of the story group this story is attached.
-type            | integer       | Media type of the story. 1 for image, 2 for video, 3 for template stories. <small>Will be filled by system, do not post this field when creating / updating a story.</small>
+type            | integer       | Media type of the story. 1 for image, 2 for video, 3 for template stories. <br><small>Will be filled by system, do not post this field when creating / updating a story.</small>
 title           | string        | Title of the story.
 sort_order      | integer       | Order of the story.
 media           | string        | URL of the optimized media.
 media_raw       | string        | URL of the original media.
-mime_type       | string        | Mime Type of the media. `image/jpeg`, `video/mp4`. <small>Will be filled by system, do not post this field when creating / updating a story.</small>
+mime_type       | string        | Mime Type of the media. `image/jpeg`, `video/mp4`.<br> <small>Will be filled by system, do not post this field when creating / updating a story.</small>
 target_cap      | integer       | Target view cap. Story will be paused when view count reaches cap.
 button_text     | string        | CTA Button text.
 outlink         | string        | CTA Button link.
-deep_link       | string        | Deep link of the story. <small>Will be filled by system, do not post this field when creating / updating a story.</small>
+deep_link       | string        | Deep link of the story. <br><small>Will be filled by system, do not post this field when creating / updating a story.</small>
 settings        | object        | Additonal story settings.
 status          | integer       | Status of the story. Only ACTIVE stories will be displayed by SDK.<br>Possible values: <br>`ACTIVE = 1`<br>`PASSIVE = 2`<br>`PASSIVE_BY_STORY_GROUP = 3`<br>`END_DATE_REACHED = 4`<br>`CAP_REACHED = 5`<br>`WAITING_MEDIA_IMPORT = 6`<br>`FAILED_MEDIA_IMPORT = 7`<br>`ARCHIVED = 9`
-views           | integer       | View count of the story. <small>Will be filled by system as story recieves impressions, do not post this field when creating / updating a story.</small>
+views           | integer       | View count of the story. <br><small>Will be filled by system as story recieves impressions, do not post this field when creating / updating a story.</small>
 ts_start        | date          | Start date of the story. Story will not be displayed by SDK if this date is not reached.
 ts_end          | date          | End date of the story. Story will not be displayed by SDK after this date is reached. Set as `null` if you do not want to set an end date.
-ts_created      | date          | Date story was created. <small>Will be filled by system, do not post this field when creating / updating a story.</small>
-ts_updated      | date          | Date story was updated. <small>Will be filled by system, do not post this field when creating / updating a story.</small>
+ts_created      | date          | Date story was created. <br><small>Will be filled by system, do not post this field when creating / updating a story.</small>
+ts_updated      | date          | Date story was updated. <br><small>Will be filled by system, do not post this field when creating / updating a story.</small>
 
 ## Create a Story
 
@@ -468,7 +487,7 @@ This endpoint lists stories.
 
 ### HTTP Request
 
-`GET https://api.storyly.io/api/story_group/detail?token=your_token_here&id=150`
+`GET https://api.storyly.io/api/story_group/detail?token=your_token_here`
 
 
 ## Update a Specific Story
@@ -503,3 +522,17 @@ Parameter | Description
 --------- | -----------
 id        | The ID of the story to update
 
+## Delete a Specific Story
+
+```sh
+curl \
+    --header 'Content-Type: application/json' \
+    --request DELETE \
+    'https://api.storyly.io/api/story?token=your_token_here&id=150'
+```
+
+This endpoint deletes a specific story. Entities will be deleted permanently.
+
+### HTTP Request
+
+`DELETE https://api.storyly.io/api/story?token=your_token_here&id=150`
